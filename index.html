@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAMSHI JARVIS AI</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;background:#020713;color:#dff8ff;
+ font-family:Arial,sans-serif;overflow-x:hidden;
+ background:radial-gradient(ellipse at center,#08264b 0%,#020713 70%);
+}
+.app{text-align:center;padding:25px 15px;max-width:600px;margin:auto}
+h1{color:#48dfff;letter-spacing:5px;text-shadow:0 0 20px #00aaff}
+.sub{color:#80cfff;letter-spacing:3px}
+.hologram{
+ width:220px;height:220px;margin:35px auto;
+ border-radius:50%;border:2px solid #16cfff;
+ box-shadow:0 0 25px #00aaff,inset 0 0 35px #007bff;
+ display:flex;align-items:center;justify-content:center;
+ animation:pulse 3s infinite;
+}
+.face{font-size:115px;filter:drop-shadow(0 0 18px #00bfff)}
+@keyframes pulse{
+ 50%{box-shadow:0 0 55px #00aaff,inset 0 0 55px #007bff}
+}
+.status{color:#00ffae;margin:20px}
+.panel{
+ border:1px solid #168dce;border-radius:18px;padding:20px;
+ background:#04152dcc;box-shadow:0 0 18px #0066aa;
+ margin:20px 0;
+}
+#reply{font-size:19px;line-height:1.6;min-height:55px}
+input{
+ width:75%;padding:14px;border-radius:25px;
+ border:1px solid #00aaff;background:#06182a;color:white;
+}
+button{
+ padding:14px 22px;border:1px solid #00cfff;
+ border-radius:30px;background:#06345a;color:white;
+ font-size:16px;margin:8px;cursor:pointer;
+ box-shadow:0 0 12px #008cff;
+}
+button:active{background:#087ab9}
+.mic{width:90px;height:90px;border-radius:50%;font-size:35px}
+.small{color:#82b9d9;font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>VAMSHI JARVIS</h1>
+<div class="sub">PERSONAL AI ASSISTANT</div>
+
+<div class="hologram">
+<div class="face">👩🏻‍💻</div>
+</div>
+
+<div class="status" id="status">● SYSTEM ONLINE</div>
+
+<div class="panel">
+<h3>FRIDAY AI</h3>
+<div id="reply">Hello Vamshi! ❤️<br>I am Jarvis. How can I help you?</div>
+</div>
+
+<div class="panel">
+<p>Speak to Jarvis</p>
+<button class="mic" onclick="listen()">🎙️</button>
+<p class="small">Tap microphone and speak</p>
+<input id="command" placeholder="Type your command...">
+<button onclick="send()">SEND</button>
+</div>
+
+<div class="panel">
+<h3>MY SYSTEM</h3>
+<p>Trading | Finance | Voice | AI</p>
+<p class="small">VAMSHI JARVIS VERSION 1.0</p>
+</div>
+</div>
+
+<script>
+const reply=document.getElementById("reply");
+const status=document.getElementById("status");
+
+function speak(text){
+ const msg=new SpeechSynthesisUtterance(text);
+ msg.lang="te-IN";
+ msg.rate=0.95;
+ speechSynthesis.cancel();
+ speechSynthesis.speak(msg);
+}
+
+function answer(text){
+ let q=text.toLowerCase();
+ let response="Vamshi, I am listening. My AI connection is not configured yet.";
+
+ if(q.includes("hello")||q.includes("హలో"))
+ response="Hello Vamshi! I am Jarvis. How are you?";
+ else if(q.includes("నీ పేరు")||q.includes("your name"))
+ response="My name is Jarvis. Your personal AI assistant.";
+ else if(q.includes("time")||q.includes("సమయం"))
+ response="The time is "+new Date().toLocaleTimeString();
+ else if(q.includes("date")||q.includes("తేదీ"))
+ response="Today is "+new Date().toLocaleDateString();
+ else if(q.includes("trading")||q.includes("ట్రేడింగ్"))
+ response="I am ready to help you with trading information.";
+ else if(q.includes("ధన్యవాదాలు")||q.includes("thank"))
+ response="You are welcome Vamshi.";
+
+ reply.innerText=response;
+ speak(response);
+}
+
+function send(){
+ const value=document.getElementById("command").value.trim();
+ if(!value)return;
+ answer(value);
+ document.getElementById("command").value="";
+}
+
+function listen(){
+ const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!Recognition){
+ reply.innerText="Speech recognition is not supported in this browser.";
+ return;
+ }
+ const rec=new Recognition();
+ rec.lang="te-IN";
+ rec.continuous=false;
+ rec.interimResults=false;
+
+ status.innerText="● LISTENING...";
+ rec.onresult=e=>{
+ const text=e.results[0][0].transcript;
+ document.getElementById("command").value=text;
+ answer(text);
+ };
+ rec.onerror=()=>{status.innerText="● SYSTEM ONLINE";};
+ rec.onend=()=>{status.innerText="● SYSTEM ONLINE";};
+ rec.start();
+}
+
+document.getElementById("command").addEventListener("keydown",e=>{
+ if(e.key==="Enter")send();
+});
+</script>
+</body>
+</html>
