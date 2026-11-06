@@ -1,10 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VAMSHI JARVIS AI</title>
+
 <style>
 *{box-sizing:border-box}
 body{
@@ -48,102 +48,193 @@ button:active{background:#087ab9}
 .small{color:#82b9d9;font-size:13px}
 </style>
 </head>
+
 <body>
 <div class="app">
+
 <h1>VAMSHI JARVIS</h1>
 <div class="sub">PERSONAL AI ASSISTANT</div>
 
 <div class="hologram">
-<div class="face">👩🏻‍💻</div>
+ <div class="face">👩🏻‍💻</div>
 </div>
 
 <div class="status" id="status">● SYSTEM ONLINE</div>
 
 <div class="panel">
-<h3>FRIDAY AI</h3>
-<div id="reply">Hello Vamshi! ❤️<br>I am Jarvis. How can I help you?</div>
+ <h3>FRIDAY AI</h3>
+ <div id="reply">Hello Vamshi! ❤️<br>I am Jarvis. How can I help you?</div>
 </div>
 
 <div class="panel">
-<p>Speak to Jarvis</p>
-<button class="mic" onclick="listen()">🎙️</button>
-<p class="small">Tap microphone and speak</p>
-<input id="command" placeholder="Type your command...">
-<button onclick="send()">SEND</button>
+ <p>Speak to Jarvis</p>
+ <button class="mic" onclick="listen()">🎙️</button>
+ <p class="small">Tap microphone and speak</p>
+ <input id="command" placeholder="Type your command...">
+ <button onclick="send()">SEND</button>
 </div>
 
 <div class="panel">
-<h3>MY SYSTEM</h3>
-<p>Trading | Finance | Voice | AI</p>
-<p class="small">VAMSHI JARVIS VERSION 1.0</p>
+ <h3>MY SYSTEM</h3>
+ <p>Trading | Finance | Voice | AI</p>
+ <p class="small">VAMSHI JARVIS VERSION 2.0</p>
 </div>
+
 </div>
 
 <script>
-const reply=document.getElementById("reply");
-const status=document.getElementById("status");
+const reply = document.getElementById("reply");
+const status = document.getElementById("status");
+const command = document.getElementById("command");
+
+let recognition = null;
+
+function isTelugu(text){
+ return /[\u0C00-\u0C7F]/.test(text);
+}
 
 function speak(text){
- const msg=new SpeechSynthesisUtterance(text);
- msg.lang="te-IN";
- msg.rate=0.95;
  speechSynthesis.cancel();
+
+ const msg = new SpeechSynthesisUtterance(text);
+
+ // Telugu text gets Telugu voice; English gets Indian English voice.
+ msg.lang = isTelugu(text) ? "te-IN" : "en-IN";
+ msg.rate = 0.95;
+ msg.pitch = 1;
+
+ const voices = speechSynthesis.getVoices();
+
+ let voice;
+
+ if(isTelugu(text)){
+   voice = voices.find(v => v.lang.toLowerCase().startsWith("te"));
+ }else{
+   voice = voices.find(v => v.lang.toLowerCase() === "en-in")
+        || voices.find(v => v.lang.toLowerCase().startsWith("en"));
+ }
+
+ if(voice) msg.voice = voice;
+
+ msg.onstart = () => status.innerText = "● JARVIS SPEAKING...";
+ msg.onend = () => status.innerText = "● SYSTEM ONLINE";
+ msg.onerror = () => status.innerText = "● SYSTEM ONLINE";
+
  speechSynthesis.speak(msg);
 }
 
 function answer(text){
- let q=text.toLowerCase();
- let response="Vamshi, I am listening. My AI connection is not configured yet.";
+ const q = text.toLowerCase().trim();
 
- if(q.includes("hello")||q.includes("హలో"))
- response="Hello Vamshi! I am Jarvis. How are you?";
- else if(q.includes("నీ పేరు")||q.includes("your name"))
- response="My name is Jarvis. Your personal AI assistant.";
- else if(q.includes("time")||q.includes("సమయం"))
- response="The time is "+new Date().toLocaleTimeString();
- else if(q.includes("date")||q.includes("తేదీ"))
- response="Today is "+new Date().toLocaleDateString();
- else if(q.includes("trading")||q.includes("ట్రేడింగ్"))
- response="I am ready to help you with trading information.";
- else if(q.includes("ధన్యవాదాలు")||q.includes("thank"))
- response="You are welcome Vamshi.";
+ let response =
+ "Vamshi, I am listening. Please tell me what you need.";
 
- reply.innerText=response;
+ if(q.includes("hello") || q.includes("హలో") || q.includes("హాయ్")){
+   response = "Hello Vamshi! I am Jarvis. How are you?";
+ }
+ else if(q.includes("నీ పేరు") || q.includes("your name")){
+   response = "My name is Jarvis. I am your personal AI assistant.";
+ }
+ else if(q.includes("ఎలా ఉన్నావు") || q.includes("how are you")){
+   response = "I am doing great, Vamshi. I am always ready to help you.";
+ }
+ else if(q.includes("time") || q.includes("సమయం")){
+   response = "The time is " + new Date().toLocaleTimeString("en-IN");
+ }
+ else if(q.includes("date") || q.includes("తేదీ")){
+   response = "Today is " + new Date().toLocaleDateString("en-IN");
+ }
+ else if(q.includes("trading") || q.includes("ట్రేడింగ్")){
+   response = "Vamshi, I am ready to help you with trading information.";
+ }
+ else if(q.includes("ధన్యవాదాలు") || q.includes("thank")){
+   response = "You are welcome Vamshi. Happy to help you.";
+ }
+ else if(q.includes("నీకు అర్థమైందా") || q.includes("do you understand")){
+   response = "Yes Vamshi, I can understand your command.";
+ }
+ else if(q.includes("good morning")){
+   response = "Good morning Vamshi! Have a wonderful day.";
+ }
+ else if(q.includes("good night")){
+   response = "Good night Vamshi. Take care.";
+ }
+
+ reply.innerText = response;
  speak(response);
 }
 
 function send(){
- const value=document.getElementById("command").value.trim();
- if(!value)return;
+ const value = command.value.trim();
+
+ if(!value) return;
+
  answer(value);
- document.getElementById("command").value="";
+ command.value = "";
 }
 
 function listen(){
- const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!Recognition){
- reply.innerText="Speech recognition is not supported in this browser.";
- return;
- }
- const rec=new Recognition();
- rec.lang="te-IN";
- rec.continuous=false;
- rec.interimResults=false;
+ const Recognition =
+   window.SpeechRecognition || window.webkitSpeechRecognition;
 
- status.innerText="● LISTENING...";
- rec.onresult=e=>{
- const text=e.results[0][0].transcript;
- document.getElementById("command").value=text;
- answer(text);
+ if(!Recognition){
+   reply.innerText =
+     "Speech recognition is not supported in this browser. Please try Chrome.";
+   return;
+ }
+
+ if(recognition){
+   try{ recognition.abort(); }catch(e){}
+ }
+
+ recognition = new Recognition();
+
+ // Telugu speech recognition. Change to en-IN for English-only commands.
+ recognition.lang = "te-IN";
+ recognition.continuous = false;
+ recognition.interimResults = false;
+ recognition.maxAlternatives = 1;
+
+ status.innerText = "● LISTENING...";
+ reply.innerText = "Listening Vamshi...";
+
+ recognition.onresult = function(event){
+   const text = event.results[0][0].transcript;
+
+   command.value = text;
+   answer(text);
  };
- rec.onerror=()=>{status.innerText="● SYSTEM ONLINE";};
- rec.onend=()=>{status.innerText="● SYSTEM ONLINE";};
- rec.start();
+
+ recognition.onerror = function(event){
+   status.innerText = "● SYSTEM ONLINE";
+
+   if(event.error === "not-allowed"){
+     reply.innerText = "Microphone permission denied. Please allow microphone access.";
+   }else{
+     reply.innerText = "Sorry Vamshi, I could not hear you. Please try again.";
+   }
+ };
+
+ recognition.onend = function(){
+   if(!speechSynthesis.speaking){
+     status.innerText = "● SYSTEM ONLINE";
+   }
+ };
+
+ try{
+   recognition.start();
+ }catch(error){
+   status.innerText = "● SYSTEM ONLINE";
+   reply.innerText = "Please tap the microphone again.";
+ }
 }
 
-document.getElementById("command").addEventListener("keydown",e=>{
- if(e.key==="Enter")send();
+command.addEventListener("keydown", function(e){
+ if(e.key === "Enter") send();
 });
+
+speechSynthesis.onvoiceschanged = function(){};
+
 </script>
 </body>
 </html>
